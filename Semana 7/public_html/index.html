@@ -155,13 +155,15 @@ function mvPopMatrix() {
    
     var triangleVertexPositionBuffer;
     var triangleVertexTextureCoordBuffer;
-    
+    var cuadVertexPositionBuffer;
+    var cuadVertexTextureCoordBuffer;
+
    
     function initBuffers() {
         triangleVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
         var vertices = [
-            //triangulo 1
+           //triangulo 1
              0.0, 2.0, 0.0, 
             -2.0, -2.0, 2.0, 
 	     2.0, -2.0, 2.0,
@@ -185,6 +187,8 @@ function mvPopMatrix() {
              2.0, -2.0, 2.0, 
 	    -2.0, -2.0, -2.0,
 	     2.0, -2.0, -2.0 
+        
+
              
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -230,13 +234,40 @@ function mvPopMatrix() {
             1.0, 1.0,
             0.0, 1.0
 
-           
        ];
        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
        triangleVertexTextureCoordBuffer.itemSize=3;
        triangleVertexTextureCoordBuffer.numItems=12;
        
-             
+        cuadVertexPositionBuffer = gl.createBuffer(); //cuadrado
+        gl.bindBuffer(gl.ARRAY_BUFFER, cuadVertexPositionBuffer);
+        var vertices = [
+            1.0, 1.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0
+                            
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        cuadVertexPositionBuffer.itemSize = 3;
+        cuadVertexPositionBuffer.numItems = 4;
+        
+        cuadVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cuadVertexTextureCoordBuffer);
+        var textureCoords= [
+             4.0,  4.0,  0.0,
+            -4.0,  4.0,  0.0,
+             4.0, -4.0,  0.0,
+            -4.0, -4.0,  0.0
+                   
+            ];
+        
+        
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+        cuadVertexTextureCoordBuffer.itemSize = 3;
+        cuadVertexTextureCoordBuffer.numItems = 4;
+
+      
     }
 
     var xRot=0;
@@ -259,7 +290,7 @@ function mvPopMatrix() {
         //mat4.rotate(mvMatrix, degToRad(zRot), [0,0,1]);//semana6
         
     mvPushMatrix();//Semana4
-    mat4.rotate(mvMatrix, degToRad(rTri), [1, 1, 0]);
+    mat4.rotate(mvMatrix, degToRad(rTri), [1, 1, 0]);//angulo de rotacion
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexTextureCoordBuffer);
@@ -277,7 +308,22 @@ function mvPopMatrix() {
         mvPopMatrix();
         mat4.translate(mvMatrix, [6.0, 0.0, -20.0]); 
         
-                
+        //translate del cuadrado
+        mat4.translate(mvMatrix, [3.0, 0.0, -6.0]);  //6,0,-20
+        
+        mvPushMatrix();//sem4
+        mat4.rotate(mvMatrix, degToRad(rSquare), [0, 0, 0]);//angulo de rotacion
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER, cuadVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,cuadVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);//4-5        
+        gl.bindBuffer(gl.ARRAY_BUFFER, cuadVertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cuadVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);//4-5
+        
+        setMatrixUniforms();
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, cuadVertexPositionBuffer.numItems);
+		
+       mvPopMatrix();//sem4
+        
     }
 
     function handleLoadedTexture(texture){
@@ -306,7 +352,7 @@ function mvPopMatrix() {
         initBuffers();
         initTexture();
         
-        gl.clearColor(0.5, 0.0, 1.0, 1.0);//1.0, 1.0, 0.5, 1.0);
+        gl.clearColor(0.5, 0.0, 1.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
         tick(); 
     }
